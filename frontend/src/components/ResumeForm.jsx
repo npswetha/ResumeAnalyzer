@@ -42,7 +42,7 @@ function ResumeForm() {
 
     try {
       const res = await axios.post(
-        "http://127.0.0.1:5000/analyze",
+        "https://resumefit-backend.onrender.com/analyze",
         formData
       );
 
