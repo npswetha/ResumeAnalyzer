@@ -2,12 +2,11 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 import os
+import json
 
 load_dotenv()
 
 api_key = os.getenv("GEMINI_API_KEY")
-print("API Key:", api_key)
-
 client = genai.Client(api_key=api_key)
 
 generation_config = types.GenerateContentConfig(
@@ -15,7 +14,7 @@ generation_config = types.GenerateContentConfig(
     top_p=0.95,
     top_k=40,
     max_output_tokens=8192,
-    response_mime_type="text/plain"
+    response_mime_type="application/json",  # <-- force JSON output
 )
 
 
@@ -34,15 +33,15 @@ def analyse_resume_gemini(resume_content, job_description):
     - Give a match score out of 100.
     - Highlight missing skills or experiences.
     - Suggest improvements.
+    - Write a short summary.
 
-    Return the result in structured format:
-    Match Score: XX/100
-    Missing Skills:
-    - ...
-    Suggestions:
-    - ...
-    Summary:
-    ...
+    Respond ONLY with valid JSON in exactly this shape, no extra text:
+    {{
+      "score": 70,
+      "missing_skills": ["...", "..."],
+      "suggestions": ["...", "..."],
+      "summary": "..."
+    }}
     """
 
     try:
@@ -51,7 +50,7 @@ def analyse_resume_gemini(resume_content, job_description):
             contents=prompt,
             config=generation_config
         )
-        return response.text
+        return json.loads(response.text)  # parse JSON server-side
 
     except Exception as e:
         print("Gemini Error:")

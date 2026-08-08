@@ -1,4 +1,3 @@
-
 import {
   AlertTriangle,
   Lightbulb,
@@ -8,157 +7,14 @@ import {
 import ScoreDial from "./ScoreDial";
 
 
-function parseAnalysis(text) {
-  if (!text || typeof text !== "string") {
-    return {
-      score: 0,
-      missingSkills: [],
-      suggestions: [],
-      summary: "",
-    };
-  }
-
-  // Convert escaped characters into normal characters
-  const cleanText = text
-    .replace(/\\n/g, "\n")
-    .replace(/\\\*/g, "*")
-    .trim();
-
-  console.log("========== ANALYSIS ==========");
-  console.log(cleanText);
-  console.log("==============================");
-
-
-  // =========================================
-  // SCORE
-  // =========================================
-
-  const scoreMatch = cleanText.match(/Match Score\s*:\s*(\d+)\s*\/\s*100/i);
-
-  const score = scoreMatch ? Number(scoreMatch[1]) : 0;
-
-
-  // =========================================
-  // FIND SECTIONS
-  // =========================================
-
-  const missingStart = cleanText.search(
-    /###\s*Missing Skills\s*:/i
-  );
-
-  const suggestionsStart = cleanText.search(
-    /###\s*Suggestions\s*:/i
-  );
-
-  const summaryStart = cleanText.search(
-    /###\s*Summary\s*:/i
-  );
-
-
-  // =========================================
-  // MISSING SKILLS
-  // =========================================
-
-  let missingSkills = [];
-
-  if (missingStart !== -1 && suggestionsStart !== -1) {
-
-    const section = cleanText
-      .substring(
-        missingStart,
-        suggestionsStart
-      )
-      .replace(
-        /###\s*Missing Skills\s*:/i,
-        ""
-      )
-      .trim();
-
-    missingSkills = section
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line.startsWith("*"))
-      .map((line) =>
-        line
-          .replace(/^\*\s*/, "")
-          .replace(/\*\*/g, "")
-          .trim()
-      )
-      .filter(Boolean);
-  }
-
-
-  // =========================================
-  // SUGGESTIONS
-  // =========================================
-
-  let suggestions = [];
-
-  if (suggestionsStart !== -1 && summaryStart !== -1) {
-
-    const section = cleanText
-      .substring(
-        suggestionsStart,
-        summaryStart
-      )
-      .replace(
-        /###\s*Suggestions\s*:/i,
-        ""
-      )
-      .trim();
-
-    suggestions = section
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line.startsWith("*"))
-      .map((line) =>
-        line
-          .replace(/^\*\s*/, "")
-          .replace(/\*\*/g, "")
-          .replace(/\*/g, "")
-          .replace(/`/g, "")
-          .trim()
-      )
-      .filter(Boolean);
-  }
-
-
-  // =========================================
-  // SUMMARY
-  // =========================================
-
-  let summary = "";
-
-  if (summaryStart !== -1) {
-
-    summary = cleanText
-      .substring(summaryStart)
-      .replace(
-        /###\s*Summary\s*:/i,
-        ""
-      )
-      .trim();
-  }
-
-
-  console.log("SCORE:", score);
-  console.log("MISSING SKILLS:", missingSkills);
-  console.log("SUGGESTIONS:", suggestions);
-  console.log("SUMMARY:", summary);
-
-
-  return {
-    score,
-    missingSkills,
-    suggestions,
-    summary,
-  };
-}
-
-
 function ResultsPanel({ analysis }) {
 
-  const data = parseAnalysis(analysis);
+  const data = {
+    score: analysis?.score ?? 0,
+    missingSkills: analysis?.missing_skills ?? [],
+    suggestions: analysis?.suggestions ?? [],
+    summary: analysis?.summary ?? "",
+  };
 
   return (
     <div className="mt-6 space-y-6">
@@ -325,4 +181,3 @@ function ResultsPanel({ analysis }) {
 
 
 export default ResultsPanel;
-
