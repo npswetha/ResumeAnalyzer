@@ -22,7 +22,9 @@ def extract_text(pdf_path):
         text += page.get_text()
 
     return text
-
+@app.route("/")
+def home():
+    return "ResumeFit backend is running!"
 
 @app.route("/analyze", methods=["POST"])
 
