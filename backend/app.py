@@ -6,7 +6,7 @@ import os
 from analyse_pdf import analyse_resume_gemini
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://resumeanalyzer-1-mxlf.onrender.com"])
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
